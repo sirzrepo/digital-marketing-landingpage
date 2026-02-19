@@ -48,6 +48,41 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
           </svg>
         </button>
       </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white border-t shadow-lg border-gray-100">
+          <div className="px-6 py-4 space-y-4">
+            {navLinks.map((link) => (
+              <button
+                key={`mobile-${link.name}`}
+                onClick={() => { link.action(); setMobileMenuOpen(false); }}
+                className={`block w-full text-left py-2 px-4 rounded-lg transition-colors ${
+                  currentPage === link.id 
+                    ? 'bg-blue-50 text-blue-600 font-medium' 
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {link.name}
+              </button>
+            ))}
+            <div className="pt-2 space-y-3">
+              <a 
+                href={ctaUrl} 
+                className="block w-full text-center px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+              >
+                Start Project
+              </a>
+              <a 
+                href="#contact" 
+                className="block w-full text-center px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+              >
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
