@@ -38,6 +38,7 @@ const detailedCases = [
     metric: '46%',
     metricLabel: 'Daily Engagement ↑',
     img: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=1200',
+    url: `https://www.sirz.co.uk/case-study-wellness_studio`,
     stats: [
       { label: 'Daily Engagement', value: '+46%' },
       { label: 'Returning Users', value: '+33%' },
@@ -64,6 +65,7 @@ const detailedCases = [
     metric: '92%',
     metricLabel: 'Patient Satisfaction ↑',
     img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1200',
+    url: `https://www.sirz.co.uk/case-study-nureva`,
     stats: [
       { label: 'Staff Capacity', value: '+40%' },
       { label: 'Response Speed', value: 'Instant' },

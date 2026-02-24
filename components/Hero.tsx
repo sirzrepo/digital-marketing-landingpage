@@ -29,9 +29,9 @@ const Hero: React.FC = () => {
               <a href={ctaUrl} className="w-full sm:w-auto px-10 py-5 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200/50 text-center">
                 Start My Project
               </a>
-              <button className="w-full sm:w-auto px-10 py-5 border border-slate-200 text-slate-700 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all">
+              <a href={ctaUrl} className="w-full sm:w-auto px-10 py-5 border border-slate-200 text-slate-700 rounded-xl font-bold text-lg hover:bg-slate-50 transition-all">
                 View Showcase
-              </button>
+              </a>
             </div>
 
             <div className="flex items-center space-x-4">

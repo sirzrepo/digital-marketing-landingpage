@@ -39,7 +39,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
 
         <div className="hidden lg:flex items-center space-x-4 font-semibold text-[14px]">
           <a href={ctaUrl} className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">Start Project</a>
-          <a href="#contact" className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all">Contact</a>
+          <a href={ctaUrl} className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all">Contact</a>
         </div>
 
         <button className="lg:hidden text-black" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>

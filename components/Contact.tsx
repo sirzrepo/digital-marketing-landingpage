@@ -1,7 +1,11 @@
 
 import React from 'react';
 
-const Contact: React.FC = () => {
+interface ContactProps {
+  onNavigate: (page: 'home' | 'campaigns' | 'results') => void;
+}
+
+const Contact: React.FC<ContactProps> = ({ onNavigate }) => {
   const ctaUrl = "https://www.sirz.co.uk/dynamic-contact?from=https%3A%2F%2Fsirz-web-solutions.vercel.app%2F";
 
   return (
@@ -17,7 +21,7 @@ const Contact: React.FC = () => {
            <a href={ctaUrl} className="w-full sm:w-auto px-10 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-500/20">
              Talk to a Strategist
            </a>
-           <button className="w-full sm:w-auto px-10 py-4 border border-white/20 text-white rounded-xl font-bold hover:bg-white/5 transition-all">
+           <button onClick={() => onNavigate('results')} className="w-full sm:w-auto px-10 py-4 border border-white/20 text-white rounded-xl font-bold hover:bg-white/5 transition-all">
              View Our Results
            </button>
         </div>

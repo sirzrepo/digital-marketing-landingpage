@@ -41,7 +41,7 @@ const App: React.FC = () => {
             <Stats />
             <Portfolio />
             <Testimonials />
-            <Contact />
+            <Contact onNavigate={setCurrentPage} />
           </>
         );
     }
