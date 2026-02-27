@@ -1,10 +1,12 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import YouTube from 'react-youtube';
 
 interface Ad {
   id: string;
   title: string;
-  img: string;
+  mediaUrl: string;
+  mediaType: 'image' | 'video';
   category: string;
 }
 
@@ -13,8 +15,12 @@ const AdSamples: React.FC = () => {
   // Dynamic data from backend
   const [categories, setCategories] = useState<string[]>(['All']);
   const [images, setImages] = useState<Ad[]>([]);
+  const [players, setPlayers] = useState<Record<string, any>>({});
+  const videoRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const observersRef = useRef<Record<string, IntersectionObserver>>({});
   // const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ?? '';
   const API_BASE_URL = 'https://api.sirz.co.uk';
+  // const API_BASE_URL = 'http://localhost:5000';
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -29,9 +35,10 @@ const AdSamples: React.FC = () => {
         const data = await res.json();
 
         const mapped: Ad[] = data.map((item: any) => ({
-          id: item._id ?? item.id ?? `${item.title}-${item.image}`,
+          id: item._id,
           title: item.title,
-          img: item.image ?? item.img,
+          mediaUrl: item.mediaUrl,
+          mediaType: item.mediaType,
           category: item.category,
         }));
 
@@ -48,6 +55,33 @@ const AdSamples: React.FC = () => {
 
     fetchImages();
   }, [activeCategory, API_BASE_URL]);
+
+  useEffect(() => {
+    Object.keys(videoRefs.current).forEach(id => {
+      const el = videoRefs.current[id];
+      if (el && players[id] && !observersRef.current[id]) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                players[id]?.playVideo();
+              } else {
+                players[id]?.pauseVideo();
+              }
+            });
+          },
+          { threshold: 0.5 }
+        );
+        observer.observe(el);
+        observersRef.current[id] = observer;
+      }
+    });
+
+    return () => {
+      Object.values(observersRef.current).forEach((observer: IntersectionObserver) => observer.disconnect());
+      observersRef.current = {};
+    };
+  }, [players]);
 
   const filteredCreatives = useMemo(() => images, [images]);
 
@@ -84,15 +118,42 @@ const AdSamples: React.FC = () => {
               key={index} 
               className="group relative aspect-[16/10] bg-slate-50 border border-slate-200 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-xl animate-in fade-in"
             >
-              <img 
-                src={ad.img} 
-                alt={ad.title} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=1200";
-                }}
-              />
+              {ad.mediaType === 'video' ? (
+                <div
+                  ref={(el) => (videoRefs.current[ad.id] = el)}
+                  onMouseEnter={() => players[ad.id]?.playVideo()}
+                  onMouseLeave={() => players[ad.id]?.pauseVideo()}
+                  className="w-full h-full transition-transform duration-700 group-hover:scale-105"
+                >
+                  <YouTube
+                    videoId={ad.mediaUrl}
+                    opts={{
+                      height: '100%',
+                      width: '100%',
+                      playerVars: {
+                        autoplay: 0,
+                        mute: 1,
+                        modestbranding: 1,
+                        controls: 0,
+                        fs: 0,
+                      },
+                    }}
+                    onReady={(event) => {
+                      setPlayers((prev) => ({ ...prev, [ad.id]: event.target }));
+                    }}
+                  />
+                </div>
+              ) : (
+                <img 
+                  src={ad.mediaUrl} 
+                  alt={ad.title} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=1200";
+                  }}
+                />
+              )}
               
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end">
                 <span className="text-[8px] font-black uppercase text-blue-400 mb-1 tracking-widest">{ad.category}</span>
