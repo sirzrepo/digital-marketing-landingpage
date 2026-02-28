@@ -18,7 +18,6 @@ const AdSamples: React.FC = () => {
   const [players, setPlayers] = useState<Record<string, any>>({});
   const videoRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const observersRef = useRef<Record<string, IntersectionObserver>>({});
-  // const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ?? '';
   const API_BASE_URL = 'https://api.sirz.co.uk';
   // const API_BASE_URL = 'http://localhost:5000';
 
@@ -64,9 +63,17 @@ const AdSamples: React.FC = () => {
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
-                players[id]?.playVideo();
+                if (players[id]?.playVideo) {
+                  players[id].playVideo();
+                } else {
+                  players[id]?.play();
+                }
               } else {
-                players[id]?.pauseVideo();
+                if (players[id]?.pauseVideo) {
+                  players[id].pauseVideo();
+                } else {
+                  players[id]?.pause();
+                }
               }
             });
           },
@@ -119,30 +126,52 @@ const AdSamples: React.FC = () => {
               className="group relative aspect-[16/10] bg-slate-50 border border-slate-200 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-xl animate-in fade-in"
             >
               {ad.mediaType === 'video' ? (
-                <div
-                  ref={(el) => (videoRefs.current[ad.id] = el)}
-                  onMouseEnter={() => players[ad.id]?.playVideo()}
-                  onMouseLeave={() => players[ad.id]?.pauseVideo()}
-                  className="w-full h-full transition-transform duration-700 group-hover:scale-105"
-                >
-                  <YouTube
-                    videoId={ad.mediaUrl}
-                    opts={{
-                      height: '100%',
-                      width: '100%',
-                      playerVars: {
-                        autoplay: 0,
-                        mute: 1,
-                        modestbranding: 1,
-                        controls: 0,
-                        fs: 0,
-                      },
+                ad.mediaUrl.startsWith('http') ? (
+                  <video
+                    ref={(el) => {
+                      videoRefs.current[ad.id] = el;
                     }}
-                    onReady={(event) => {
-                      setPlayers((prev) => ({ ...prev, [ad.id]: event.target }));
+                    src={ad.mediaUrl}
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onMouseEnter={() => players[ad.id]?.play()}
+                    onMouseLeave={() => players[ad.id]?.pause()}
+                    onLoadedMetadata={(e) => {
+                      setPlayers((prev) => ({ ...prev, [ad.id]: e.target }));
+                    }}
+                    onError={(e) => {
+                      const target = e.target as HTMLVideoElement;
+                      target.style.display = 'none';
                     }}
                   />
-                </div>
+                ) : (
+                  <div
+                    ref={(el) => (videoRefs.current[ad.id] = el)}
+                    onMouseEnter={() => players[ad.id]?.playVideo()}
+                    onMouseLeave={() => players[ad.id]?.pauseVideo()}
+                    className="w-full h-full transition-transform duration-700 group-hover:scale-105"
+                  >
+                    <YouTube
+                      videoId={ad.mediaUrl}
+                      opts={{
+                        height: '100%',
+                        width: '100%',
+                        playerVars: {
+                          autoplay: 0,
+                          mute: 1,
+                          modestbranding: 1,
+                          controls: 0,
+                          fs: 0,
+                        },
+                      }}
+                      onReady={(event) => {
+                        setPlayers((prev) => ({ ...prev, [ad.id]: event.target }));
+                      }}
+                    />
+                  </div>
+                )
               ) : (
                 <img 
                   src={ad.mediaUrl} 
